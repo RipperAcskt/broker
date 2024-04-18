@@ -23,7 +23,7 @@ func New() *Server {
 
 func (s *Server) Run(handler http.Handler) error {
 	s.httpServer = &http.Server{
-		Addr:    "localhost:8080",
+		Addr:    ":1543",
 		Handler: handler,
 	}
 

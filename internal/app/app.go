@@ -2,10 +2,12 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/RipperAcskt/broker/internal/server/handlers"
 	"github.com/RipperAcskt/broker/internal/usecases"
 	"go.uber.org/zap"
+	"net/http"
 
 	"github.com/RipperAcskt/broker/internal/repository/mongo"
 	"github.com/RipperAcskt/broker/internal/server"
@@ -50,7 +52,7 @@ func (a *App) Run() error {
 	srv.Log, _ = zap.NewProduction()
 
 	go func(errChan chan error) {
-		if err := srv.Run(handl.InitRouters()); err != nil {
+		if err := srv.Run(handl.InitRouters()); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errChan <- fmt.Errorf("server run failed: %w", err)
 		}
 	}(a.errChan)
@@ -59,6 +61,7 @@ func (a *App) Run() error {
 		if err := srv.WaitForShutDown(); err != nil {
 			errChan <- fmt.Errorf("shut down failed: %w", err)
 		}
+		close(errChan)
 	}(a.errChan)
 
 	for err := range a.errChan {

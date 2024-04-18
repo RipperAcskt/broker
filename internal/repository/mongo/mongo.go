@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	connectionUrl = "mongodb://localhost:27017"
+	connectionUrl = "mongodb://mongo:27017"
 	database      = "broker"
 )
 
